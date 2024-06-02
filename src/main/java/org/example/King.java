@@ -1,6 +1,8 @@
 package org.example;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class King extends Piece {
     public King(int x, int y, PieceColor pieceColor) {
@@ -16,5 +18,11 @@ public class King extends Piece {
     @Override
     public boolean isValidMove(int newX, int newY, Board board) {
         return false;
+    }
+
+    @Override
+    public List<Coordinate> possibleMoves(Board board) {
+        List<Coordinate> possibleMoves = new ArrayList<>();
+        return possibleMoves;
     }
 }

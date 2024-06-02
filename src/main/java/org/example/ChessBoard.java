@@ -5,13 +5,14 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.Vector;
+import java.util.List;
+
 
 public class ChessBoard extends JPanel {
     private Board board;
     private Piece selectedPiece;
     private PieceColor nextPlayer;
+    private List<Coordinate> highlightedMoves = new ArrayList<>();
 
 
     public ChessBoard(Board board) {
@@ -65,14 +66,21 @@ public class ChessBoard extends JPanel {
 
                     // Clear the selected piece
                     selectedPiece = null;
+                    highlightedMoves.clear();
                     repaint();
+
                 }
             } else {
                 selectedPiece = null;
             }
         } else {
             selectedPiece = board.getPiece(row, col);
+            if (selectedPiece != null && selectedPiece.getColor() == nextPlayer) {
+                highlightedMoves = selectedPiece.possibleMoves(board);
+            }
+
         }
+        repaint();
     }
 
     @Override
@@ -84,7 +92,7 @@ public class ChessBoard extends JPanel {
                 if ((row + col) % 2 == 0) {
                     g.setColor(Color.WHITE);
                 } else {
-                    g.setColor(Color.GRAY);
+                    g.setColor(new Color(105,146,62));
                 }
                 g.fillRect(col * 100, row * 100, 100, 100);
             }
@@ -97,6 +105,12 @@ public class ChessBoard extends JPanel {
                     g.drawImage(piece.getImage(), col * 100, row * 100, this);
                 }
             }
+        }
+        g.setColor(new Color(0, 255, 0, 128)); // Semi-transparent green
+        for (Coordinate move : highlightedMoves) {
+            int x = move.getY() * 100 + 50 - 15; // Centered on the square
+            int y = move.getX() * 100 + 50 - 15;
+            g.fillOval(x, y, 30, 30); // Draw the circle
         }
     }
 }

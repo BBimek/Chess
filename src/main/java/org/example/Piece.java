@@ -1,6 +1,7 @@
 package org.example;
 
 import java.awt.*;
+import java.util.List;
 
 public abstract class Piece {
     protected Image image;
@@ -39,4 +40,5 @@ public abstract class Piece {
         return color;
     }
     public abstract boolean isValidMove(int newX, int newY, Board board);
+    public abstract List<Coordinate> possibleMoves(Board board);
 }

@@ -1,6 +1,8 @@
 package org.example;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Pawn extends Piece {
     private int direction;
@@ -43,5 +45,45 @@ public class Pawn extends Piece {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public List<Coordinate> possibleMoves(Board board) {
+        List<Coordinate> possibleMoves = new ArrayList<>();
+        int direction = (getColor() == PieceColor.WHITE) ? -1 : 1;
+
+        // Move forward one square
+        if (isValidCoordinate(x + direction, y) && board.getPiece(x + direction, y) == null) {
+            possibleMoves.add(new Coordinate(x + direction, y));
+        }
+
+        // Move forward two squares from initial position
+        if (firstMove) {
+            if (isValidCoordinate(x + direction * 2, y) && board.getPiece(x + direction * 2, y) == null && board.getPiece(x + direction, y) == null) {
+                possibleMoves.add(new Coordinate(x + direction * 2, y));
+            }
+        }
+
+        // Capture diagonally right
+        if (isValidCoordinate(x + direction, y + 1)) {
+            Piece p = board.getPiece(x + direction, y + 1);
+            if (p != null && p.getColor() != getColor()) {
+                possibleMoves.add(new Coordinate(x + direction, y + 1));
+            }
+        }
+
+        // Capture diagonally left
+        if (isValidCoordinate(x + direction, y - 1)) {
+            Piece p = board.getPiece(x + direction, y - 1);
+            if (p != null && p.getColor() != getColor()) {
+                possibleMoves.add(new Coordinate(x + direction, y - 1));
+            }
+        }
+
+        return possibleMoves;
+    }
+
+    private boolean isValidCoordinate(int x, int y) {
+        return x >= 0 && x < 8 && y >= 0 && y < 8;
     }
 }
