@@ -1,6 +1,8 @@
 package org.example;
 
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Knight extends Piece {
     public Knight(int x, int y, PieceColor pieceColor) {
@@ -30,5 +32,37 @@ public class Knight extends Piece {
             }
         }
         return true;
+    }
+
+    @Override
+    public List<Coordinate> possibleMoves(Board board) {
+        List<Coordinate> possibleMoves = new ArrayList<>();
+        int[][] directions = {
+                {-2, -1}, //up left
+                {-2, 1},  //up right
+                {-1, 2},  //right up
+                {1, 2},   //right down
+                {2, 1},   //down right
+                {2, -1},  //down left
+                {-1, -2}, //left down
+                {1, -2}  //left up
+        };
+
+        getMoves(board, possibleMoves, directions);
+        return possibleMoves;
+    }
+    public void getMoves(Board board, List<Coordinate> possibleMoves, int[][] directions) {
+        for (int[] direction : directions) {
+            int i = x + direction[0];
+            int j = y + direction[1];
+
+            // Check borders
+            if (i >= 0 && i < 8 && j >= 0 && j < 8) {
+                Piece p = board.getPiece(i, j);
+                if (p == null || p.getColor() != color) {
+                    possibleMoves.add(new Coordinate(i, j));
+                }
+            }
+        }
     }
 }

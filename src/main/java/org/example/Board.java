@@ -11,6 +11,7 @@ public class Board {
     private Map<Coordinate,Piece> piecesOnBoard;
     private boolean isInCheck;
     private List<String> annotations = new ArrayList<>();
+    private List<Coordinate> possibleMoves = new ArrayList<>();
     private int moveCount;
 
     public Board() {
