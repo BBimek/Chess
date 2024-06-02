@@ -84,7 +84,7 @@ public class ChessBoard extends JPanel {
                 if ((row + col) % 2 == 0) {
                     g.setColor(Color.WHITE);
                 } else {
-                    g.setColor(Color.GRAY);
+                    g.setColor(new Color(105,146,62));
                 }
                 g.fillRect(col * 100, row * 100, 100, 100);
             }
