@@ -35,52 +35,56 @@ public class ChessBoard extends JPanel {
 
         if (selectedPiece != null && nextPlayer == selectedPiece.getColor()) {
             if (selectedPiece.isValidMove(row, col, board)) {
-                // Store original positions
-                int originalX = selectedPiece.getX();
-                int originalY = selectedPiece.getY();
-                Piece originalDestinationPiece = board.getPiece(row, col);
-
-                // Perform the hypothetical move
-                board.movePiece(originalX, originalY, row, col);
-
-                // Check if the move exposes the king to check
-                if (board.isInCheck(selectedPiece.getColor())) {
-                    // Revert the move
-                    board.movePiece(row, col, originalX, originalY);
-                    if (originalDestinationPiece != null) {
-                        board.setPiece(row, col, originalDestinationPiece);
-                    }
-                    System.out.println("Illegal move: King would be in check.");
-                } else {
-                    // Finalize the move
-                    selectedPiece.setX(row);
-                    selectedPiece.setY(col);
-
-                    // Switch the player turn
-                    nextPlayer = (selectedPiece.getColor() == PieceColor.WHITE) ? PieceColor.BLACK : PieceColor.WHITE;
-
-                    // Check if the next player is in check
-                    if (board.isInCheck(nextPlayer)) {
-                        System.out.println("Šach");
-                    }
-
+                if (tryMovePiece(row, col)) {
+                    //finish move
+                    finalizeMove(row, col);
                     // Clear the selected piece
-                    selectedPiece = null;
-                    highlightedMoves.clear();
-                    repaint();
-
+                    clearPiece();
+                    return;
                 }
-            } else {
-                selectedPiece = null;
             }
-        } else {
-            selectedPiece = board.getPiece(row, col);
-            if (selectedPiece != null && selectedPiece.getColor() == nextPlayer) {
-                highlightedMoves = selectedPiece.possibleMoves(board);
-            }
+        }
 
+        selectedPiece = board.getPiece(row, col);
+        if (selectedPiece != null && selectedPiece.getColor() == nextPlayer) {
+            highlightedMoves = selectedPiece.possibleMoves(board);
         }
         repaint();
+    }
+
+    private void clearPiece() {
+        selectedPiece = null;
+        highlightedMoves.clear();
+        repaint();
+    }
+
+    private boolean tryMovePiece(int newRow, int newCol) {
+
+        // Store original positions
+        int originalRow = selectedPiece.getX();
+        int originalCol = selectedPiece.getY();
+        Piece originalDestinationPiece = board.getPiece(newRow, newCol);
+
+        // Perform the hypothetical move
+        board.movePiece(originalRow, originalCol, newRow, newCol);
+
+        // Check if the move exposes the king to check
+        boolean isInCheck = board.isInCheck(selectedPiece.getColor());
+
+        if (isInCheck) {
+            //revert the move
+            board.movePiece(newRow, newCol, originalRow, originalCol);
+            if (originalDestinationPiece != null) {
+                board.setPiece(newRow, newCol, originalDestinationPiece);
+            }
+        }
+        return !isInCheck;
+    }
+
+    private void finalizeMove(int row, int col) {
+        selectedPiece.setX(row);
+        selectedPiece.setY(col);
+        nextPlayer = (selectedPiece.getColor() == PieceColor.WHITE) ? PieceColor.BLACK : PieceColor.WHITE;
     }
 
     @Override
@@ -92,7 +96,7 @@ public class ChessBoard extends JPanel {
                 if ((row + col) % 2 == 0) {
                     g.setColor(Color.WHITE);
                 } else {
-                    g.setColor(new Color(105,146,62));
+                    g.setColor(new Color(105, 146, 62));
                 }
                 g.fillRect(col * 100, row * 100, 100, 100);
             }

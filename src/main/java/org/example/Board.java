@@ -55,9 +55,6 @@ public class Board {
         piecesOnBoard.put(new Coordinate(x, y), piece);
     }
 
-    public void removePiece(int x, int y) {
-        piecesOnBoard.remove(new Coordinate(x, y));
-    }
     public void movePiece(int startX, int startY, int endX, int endY) {
         Coordinate start = new Coordinate(startX, startY);
         Coordinate end = new Coordinate(endX, endY);
