@@ -15,6 +15,10 @@ public class Knight extends Piece {
             this.image = new ImageIcon(Pawn.class.getResource("/white-knight.png")).getImage();
         }
     }
+    @Override
+    public Piece copy() {
+        return new Knight(this.getX(), this.getY(), this.getColor());
+    }
 
     @Override
     public boolean isValidMove(int newX, int newY, Board board) {

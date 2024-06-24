@@ -18,6 +18,10 @@ public class Rook extends Piece {
         }
     }
     @Override
+    public Piece copy() {
+        return new Rook(this.getX(), this.getY(), this.getColor());
+    }
+    @Override
     public boolean isValidMove(int newX, int newY, Board board) {
         Piece p = board.getPiece(newX, newY);
         if (newX != x && newY != y) {

@@ -22,6 +22,13 @@ public class Pawn extends Piece {
             this.firstMove = true;
         }
     }
+    public void setFirstMove() {
+        firstMove = false;
+    }
+    @Override
+    public Piece copy() {
+        return new Pawn(this.getX(), this.getY(), this.getColor());
+    }
 
     @Override
     public boolean isValidMove(int newX, int newY, Board board) {

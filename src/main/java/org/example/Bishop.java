@@ -15,6 +15,10 @@ public class Bishop extends Piece {
             this.image = new ImageIcon(Pawn.class.getResource("/white-bishop.png")).getImage();
         }
     }
+    @Override
+    public Piece copy() {
+        return new Bishop(this.getX(), this.getY(), this.getColor());
+    }
 
     @Override
     public boolean isValidMove(int newX, int newY, Board board) {

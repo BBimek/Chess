@@ -1,9 +1,7 @@
 package org.example;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class Board {
     private Square[][] board;
@@ -16,6 +14,14 @@ public class Board {
         this.moveCount = 0;
         setupSquares();
         setupPieces();
+    }
+    public Board(boolean setupPieces) {
+        board = new Square[8][8];
+        this.moveCount = 0;
+        setupSquares();
+        if (setupPieces) {
+            setupPieces();
+        }
     }
 
     private void setupSquares() {
@@ -78,7 +84,7 @@ public class Board {
         startSquare.setPiece(null);
         myPiece.setX(endX);
         myPiece.setY(endY);
-        createAnnotation(myPiece, taken, startX, startY, endX, endY);
+        //createAnnotation(myPiece, taken, startX, startY, endX, endY);
         moveCount++;
     }
 
@@ -88,14 +94,16 @@ public class Board {
             for (int col = 0; col < 8; col++) {
                 Piece piece = board[row][col].getPiece();
                 if (piece != null && piece.getColor() != color && piece.isValidMove(kingPosition.getX(), kingPosition.getY(), this)) {
+                    isInCheck = true;
                     return true;
                 }
             }
         }
+        isInCheck = false;
         return false;
     }
 
-    private Coordinate getKingPosition(PieceColor color) {
+    public Coordinate getKingPosition(PieceColor color) {
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
                 Piece piece = board[row][col].getPiece();
@@ -105,6 +113,26 @@ public class Board {
             }
         }
         return null;
+    }
+
+    public boolean isInCheckAfterMove(int startX, int startY, int endX, int endY) {
+        Board copyBoard = this.copy();
+        copyBoard.movePiece(startX, startY, endX, endY);
+        PieceColor color = copyBoard.getPiece(endX, endY).getColor();
+        return copyBoard.isInCheck(color);
+    }
+
+    public Board copy() {
+        Board copy = new Board(false);
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Piece piece = this.getPiece(row, col);
+                if (piece != null) {
+                    copy.setPiece(row, col, piece.copy());
+                }
+            }
+        }
+        return copy;
     }
 
     private void createAnnotation(Piece myPiece, boolean taken, int startX, int startY, int endX, int endY) {

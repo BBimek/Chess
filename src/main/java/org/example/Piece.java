@@ -41,4 +41,5 @@ public abstract class Piece {
     }
     public abstract boolean isValidMove(int newX, int newY, Board board);
     public abstract List<Coordinate> possibleMoves(Board board);
+    public abstract Piece copy();
 }
