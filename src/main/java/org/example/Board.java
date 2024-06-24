@@ -1,96 +1,107 @@
 package org.example;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 public class Board {
-    private Piece[][] board;
-    private Map<Coordinate,Piece> piecesOnBoard;
+    private Square[][] board;
     private boolean isInCheck;
     private List<String> annotations = new ArrayList<>();
-    private List<Coordinate> possibleMoves = new ArrayList<>();
     private int moveCount;
 
     public Board() {
-        board = new Piece[8][8];
-        piecesOnBoard = new HashMap<>();
+        board = new Square[8][8];
         this.moveCount = 0;
+        setupSquares();
         setupPieces();
+    }
+
+    private void setupSquares() {
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                board[row][col] = new Square(row, col);
+            }
+        }
     }
 
     private void setupPieces() {
         for (int i = 0; i < 8; i++) {
-            piecesOnBoard.put(new Coordinate(1, i), new Pawn(1, i, PieceColor.BLACK));
+            board[1][i].setPiece(new Pawn(1, i, PieceColor.BLACK));
+            board[6][i].setPiece(new Pawn(6, i, PieceColor.WHITE));
         }
-        for (int i = 0; i < 8; i++) {
-            piecesOnBoard.put(new Coordinate(6, i), new Pawn(6, i, PieceColor.WHITE));
-        }
-        piecesOnBoard.put(new Coordinate(0, 0), new Rook(0, 0, PieceColor.BLACK));
-        piecesOnBoard.put(new Coordinate(0, 7), new Rook(0, 7, PieceColor.BLACK));
-        piecesOnBoard.put(new Coordinate(0, 1), new Knight(0, 1, PieceColor.BLACK));
-        piecesOnBoard.put(new Coordinate(0, 6), new Knight(0, 6, PieceColor.BLACK));
-        piecesOnBoard.put(new Coordinate(0, 2), new Bishop(0, 2, PieceColor.BLACK));
-        piecesOnBoard.put(new Coordinate(0, 5), new Bishop(0, 5, PieceColor.BLACK));
-        piecesOnBoard.put(new Coordinate(0, 3), new Queen(0, 3, PieceColor.BLACK));
-        piecesOnBoard.put(new Coordinate(0, 4), new King(0, 4, PieceColor.BLACK));
 
-        piecesOnBoard.put(new Coordinate(7, 0), new Rook(7, 0, PieceColor.WHITE));
-        piecesOnBoard.put(new Coordinate(7, 7), new Rook(7, 7, PieceColor.WHITE));
-        piecesOnBoard.put(new Coordinate(7, 1), new Knight(7, 1, PieceColor.WHITE));
-        piecesOnBoard.put(new Coordinate(7, 6), new Knight(7, 6, PieceColor.WHITE));
-        piecesOnBoard.put(new Coordinate(7, 2), new Bishop(7, 2, PieceColor.WHITE));
-        piecesOnBoard.put(new Coordinate(7, 5), new Bishop(7, 5, PieceColor.WHITE));
-        piecesOnBoard.put(new Coordinate(7, 3), new Queen(7, 3, PieceColor.WHITE));
-        piecesOnBoard.put(new Coordinate(7, 4), new King(7, 4, PieceColor.WHITE));
+        board[0][0].setPiece(new Rook(0, 0, PieceColor.BLACK));
+        board[0][7].setPiece(new Rook(0, 7, PieceColor.BLACK));
+        board[0][1].setPiece(new Knight(0, 1, PieceColor.BLACK));
+        board[0][6].setPiece(new Knight(0, 6, PieceColor.BLACK));
+        board[0][2].setPiece(new Bishop(0, 2, PieceColor.BLACK));
+        board[0][5].setPiece(new Bishop(0, 5, PieceColor.BLACK));
+        board[0][3].setPiece(new Queen(0, 3, PieceColor.BLACK));
+        board[0][4].setPiece(new King(0, 4, PieceColor.BLACK));
+
+        board[7][0].setPiece(new Rook(7, 0, PieceColor.WHITE));
+        board[7][7].setPiece(new Rook(7, 7, PieceColor.WHITE));
+        board[7][1].setPiece(new Knight(7, 1, PieceColor.WHITE));
+        board[7][6].setPiece(new Knight(7, 6, PieceColor.WHITE));
+        board[7][2].setPiece(new Bishop(7, 2, PieceColor.WHITE));
+        board[7][5].setPiece(new Bishop(7, 5, PieceColor.WHITE));
+        board[7][3].setPiece(new Queen(7, 3, PieceColor.WHITE));
+        board[7][4].setPiece(new King(7, 4, PieceColor.WHITE));
     }
 
     public Piece getPiece(int x, int y) {
-        return piecesOnBoard.get(new Coordinate(x, y));
+        return board[x][y].getPiece();
     }
 
     public void setPiece(int x, int y, Piece piece) {
-        piecesOnBoard.put(new Coordinate(x, y), piece);
+        board[x][y].setPiece(piece);
     }
 
     public void movePiece(int startX, int startY, int endX, int endY) {
-        Coordinate start = new Coordinate(startX, startY);
-        Coordinate end = new Coordinate(endX, endY);
+        Square startSquare = board[startX][startY];
+        Square endSquare = board[endX][endY];
         boolean taken = false;
 
-        Piece myPiece = piecesOnBoard.get(start);
-        Piece oponentPiece = piecesOnBoard.get(end);
+        Piece myPiece = startSquare.getPiece();
+        Piece opponentPiece = endSquare.getPiece();
 
-        //If capture is about to happen
-        if (oponentPiece != null && oponentPiece.getColor() != myPiece.getColor()) {
-            piecesOnBoard.remove(end);
+        // If capture is about to happen
+        if (opponentPiece != null && opponentPiece.getColor() != myPiece.getColor()) {
+            endSquare.setPiece(null);
             taken = true;
         }
-        //set new location for moved piece
-        piecesOnBoard.put(end,myPiece);
-        piecesOnBoard.remove(start);
+
+        // Set new location for moved piece
+        endSquare.setPiece(myPiece);
+        startSquare.setPiece(null);
         myPiece.setX(endX);
         myPiece.setY(endY);
         createAnnotation(myPiece, taken, startX, startY, endX, endY);
         moveCount++;
     }
+
     public boolean isInCheck(PieceColor color) {
         Coordinate kingPosition = getKingPosition(color);
-        for (Map.Entry<Coordinate,Piece> entry : piecesOnBoard.entrySet()) {
-            Piece piece = entry.getValue();
-            if (piece.getColor()!=color && piece.isValidMove(kingPosition.getX(), kingPosition.getY(), this)) {
-                return true;
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Piece piece = board[row][col].getPiece();
+                if (piece != null && piece.getColor() != color && piece.isValidMove(kingPosition.getX(), kingPosition.getY(), this)) {
+                    return true;
+                }
             }
         }
         return false;
     }
+
     private Coordinate getKingPosition(PieceColor color) {
-        for (Map.Entry<Coordinate,Piece> entry : piecesOnBoard.entrySet()) {
-            Piece piece = entry.getValue();
-            if (piece instanceof King && piece.getColor() == color) {
-                return entry.getKey();
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                Piece piece = board[row][col].getPiece();
+                if (piece instanceof King && piece.getColor() == color) {
+                    return new Coordinate(row, col);
+                }
             }
         }
         return null;
