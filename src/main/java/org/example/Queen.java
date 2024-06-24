@@ -15,6 +15,10 @@ public class Queen extends Piece {
             this.image = new ImageIcon(Pawn.class.getResource("/white-queen.png")).getImage();
         }
     }
+    @Override
+    public Piece copy() {
+        return new Queen(this.getX(), this.getY(), this.getColor());
+    }
 
     @Override
     public boolean isValidMove(int newX, int newY, Board board) {
