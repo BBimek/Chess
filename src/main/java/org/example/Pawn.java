@@ -7,7 +7,6 @@ import java.util.List;
 public class Pawn extends Piece {
     private int direction;
     private boolean firstMove;
-
     public Pawn(int x, int y, PieceColor pieceColor) {
         super(pieceColor, x, y);
         this.name = "Pawn";
@@ -22,9 +21,11 @@ public class Pawn extends Piece {
             this.firstMove = true;
         }
     }
+
     public void setFirstMove() {
         firstMove = false;
     }
+
     @Override
     public Piece copy() {
         return new Pawn(this.getX(), this.getY(), this.getColor());
@@ -55,7 +56,7 @@ public class Pawn extends Piece {
     }
 
     @Override
-    public List<Coordinate> possibleMoves(Board board) {
+    public List<Coordinate> possibleMoves(Board board, List<MoveHistory> moveHistory) {
         List<Coordinate> possibleMoves = new ArrayList<>();
         int direction = (getColor() == PieceColor.WHITE) ? -1 : 1;
 
@@ -86,8 +87,19 @@ public class Pawn extends Piece {
                 possibleMoves.add(new Coordinate(x + direction, y - 1));
             }
         }
+        if (!moveHistory.isEmpty()) {
+            enPassant(possibleMoves, moveHistory);
+        }
 
         return possibleMoves;
+    }
+
+    private void enPassant(List<Coordinate> possibleMoves, List<MoveHistory> moveHistory) {
+        MoveHistory lastMove = moveHistory.getLast();
+        if (lastMove.getCriteriaForEnPassantMet() && (Math.abs(y - lastMove.getEndY())) == 1 && this.color != lastMove.getColor() && x == lastMove.getEndX()) {
+            int directionY = Integer.compare(y, lastMove.getEndY());
+            possibleMoves.add(new Coordinate(lastMove.getEndX() + direction, y - (directionY)));
+        }
     }
 
     private boolean isValidCoordinate(int x, int y) {

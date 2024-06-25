@@ -15,6 +15,7 @@ public class ChessBoard extends JPanel {
     private List<Coordinate> highlightedMoves = new ArrayList<>();
     private Square[][] squares = new Square[8][8];
     private boolean isInCheck;
+    private List<MoveHistory> moveHistory = new ArrayList<>();
 
     public ChessBoard(Board board) {
         this.board = board;
@@ -53,8 +54,7 @@ public class ChessBoard extends JPanel {
             Coordinate movePiece = new Coordinate(row,col);
             for (Coordinate move : highlightedMoves) {
                 if (move.equals(movePiece)) {
-                    board.movePiece(selectedPiece.getX(),selectedPiece.getY(),row,col);
-                    finalizeMove(row,col);
+                    finalizeMove(row,col, square);
                     if (selectedPiece.getColor() == PieceColor.WHITE) {
                         isInCheck = board.isInCheck(PieceColor.BLACK);
                     } else {
@@ -80,7 +80,7 @@ public class ChessBoard extends JPanel {
 
         selectedPiece = board.getPiece(row, col);
         if (selectedPiece != null && selectedPiece.getColor() == nextPlayer) {
-            highlightedMoves = selectedPiece.possibleMoves(board);
+            highlightedMoves = selectedPiece.possibleMoves(board, moveHistory);
 
             highlightedMoves.removeIf(move -> board.isInCheckAfterMove(selectedPiece.getX(), selectedPiece.getY(), move.getX(), move.getY()));
         }
@@ -90,7 +90,7 @@ public class ChessBoard extends JPanel {
         Coordinate kingLocation = new Coordinate(board.getKingPosition(nextPlayer).getX(), board.getKingPosition(nextPlayer).getY());
         Piece king = board.getPiece(kingLocation.getX(), kingLocation.getY());
         if (king != null) {
-            List<Coordinate> moves = king.possibleMoves(board);
+            List<Coordinate> moves = king.possibleMoves(board, moveHistory);
             moves.removeIf(move -> board.isInCheckAfterMove(kingLocation.getX(), kingLocation.getY(), move.getX(), move.getY()));
             boolean possible = canOtherPiecesBlock(king.getColor());
             if (moves.isEmpty() && !possible) {
@@ -106,7 +106,7 @@ public class ChessBoard extends JPanel {
                 Square s = squares[row][col];
                 Piece p = s.getPiece();
                 if (p != null && p.getColor() == color) {
-                    List<Coordinate> coords = s.getPiece().possibleMoves(board);
+                    List<Coordinate> coords = s.getPiece().possibleMoves(board, moveHistory);
                     coords.removeIf(move -> board.isInCheckAfterMove(p.getX(), p.getY(), move.getX(), move.getY()));
                     if (!coords.isEmpty()) {
                         return true;
@@ -141,14 +141,23 @@ public class ChessBoard extends JPanel {
         return !isInCheck;
     }
 
-    private void finalizeMove(int row, int col) {
-        selectedPiece.setX(row);
-        selectedPiece.setY(col);
+    private void finalizeMove(int row, int col, Square square) {
+        int originalX = selectedPiece.getX();
+        board.movePiece(selectedPiece.getX(),selectedPiece.getY(),row,col);
+
+        boolean criteriaForEnPassant = false;
         if (selectedPiece instanceof Pawn) {
             ((Pawn) selectedPiece).setFirstMove();
+            if (Math.abs(originalX - row) == 2) {
+                criteriaForEnPassant = true;
+            }
         }
         nextPlayer = (selectedPiece.getColor() == PieceColor.WHITE) ? PieceColor.BLACK : PieceColor.WHITE;
+        MoveHistory move = new MoveHistory(selectedPiece.getX(), selectedPiece.getY(), row, col, selectedPiece, criteriaForEnPassant, selectedPiece.getColor());
+        moveHistory.add(move);
     }
+
+
 
     private void updateBoard() {
         for (int row = 0; row < 8; row++) {

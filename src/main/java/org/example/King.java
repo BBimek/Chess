@@ -34,7 +34,7 @@ public class King extends Piece {
     }
 
     @Override
-    public List<Coordinate> possibleMoves(Board board) {
+    public List<Coordinate> possibleMoves(Board board, List<MoveHistory> moveHistory) {
         List<Coordinate> possibleMoves = new ArrayList<>();
         int[][] allDirections = {
                 {-1, 0},  // Up

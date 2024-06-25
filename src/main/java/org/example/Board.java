@@ -79,6 +79,17 @@ public class Board {
             taken = true;
         }
 
+
+        if (myPiece instanceof Pawn) {
+            if (endY != startY) {
+                if (opponentPiece == null) {
+                    System.out.println("enpassant");
+                    int direction =  Integer.compare(startX,endX);
+                    board[endX + direction][endY].setPiece(null);
+                }
+            }
+        }
+
         // Set new location for moved piece
         endSquare.setPiece(myPiece);
         startSquare.setPiece(null);

@@ -40,6 +40,6 @@ public abstract class Piece {
         return color;
     }
     public abstract boolean isValidMove(int newX, int newY, Board board);
-    public abstract List<Coordinate> possibleMoves(Board board);
+    public abstract List<Coordinate> possibleMoves(Board board, List<MoveHistory> moveHistory);
     public abstract Piece copy();
 }
